@@ -20,12 +20,20 @@ async function writeExcelTest() {
     await workbook.xlsx.readFile(filePath);
 
     const worksheet = workbook.getWorksheet('Sheet1');
+    let output = { row: -1, column: -1 };
     // for loop
     worksheet.eachRow((row, rowNumber) => {
         row.eachCell((cell, colNumber) => {
-            console.log(cell.value);
+            if (cell.value === 'Banana') {
+                output.row = rowNumber;
+                output.column = colNumber;
+            }
         });
     });
+
+    const cell = worksheet.getCell(3, 2);
+    cell.value = 'Republic';
+    await workbook.xlsx.writeFile(filePath);
 }
 
 writeExcelTest();

@@ -1,39 +1,33 @@
 const ExcelJs = require('exceljs');
 const path = require('path');
 
-async function writeExcelTest() {
+async function writeExcelTest(searchText, replaceText, change, filePath) {
     const workbook = new ExcelJs.Workbook();
-    // await workbook.xlsx.readFile(
-    //     'C:\Users\Rawst\Documents\Study\PlaywrightStudy\excelDownloadTest.xlsx',
-    // );
-    // gpt改的  不然會報錯
-    const filePath = path.join(
-        'C:',
-        'Users',
-        'Rawst',
-        'Documents',
-        'Study',
-        'PlaywrightStudy',
-        'excelDownloadTest.xlsx',
-    );
-
     await workbook.xlsx.readFile(filePath);
-
     const worksheet = workbook.getWorksheet('Sheet1');
+    const output = await readExcel(worksheet, searchText, change);
+
+    const cell = worksheet.getCell(output.row, output.column + change.colChange);
+    cell.value = replaceText;
+    await workbook.xlsx.writeFile(filePath);
+}
+
+async function readExcel(worksheet, searchText) {
     let output = { row: -1, column: -1 };
-    // for loop
     worksheet.eachRow((row, rowNumber) => {
         row.eachCell((cell, colNumber) => {
-            if (cell.value === 'Banana') {
+            if (cell.value === searchText) {
                 output.row = rowNumber;
                 output.column = colNumber;
             }
         });
     });
-
-    const cell = worksheet.getCell(3, 2);
-    cell.value = 'Republic';
-    await workbook.xlsx.writeFile(filePath);
+    return output;
 }
 
-writeExcelTest();
+writeExcelTest(
+    'Mango',
+    350,
+    { rowChange: 0, colChange: 2 },
+    'C:/Users/Rawst/Documents/Study/PlaywrightStudy/excelDownloadTest.xlsx',
+);
